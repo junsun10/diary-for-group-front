@@ -1,26 +1,30 @@
+<!-- App.vue -->
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <h1 @click="goToMainPage">일기장</h1>
+  <button @click="goToMainPage">홈</button>
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  methods: {
+    goToMainPage() {
+      if (this.$store.state.isLoggedIn) {
+        this.$router.push('/main');
+      } else {
+        this.$router.push('/before-login');
+      }
+    }
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: Arial, sans-serif;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
