@@ -1,7 +1,9 @@
 <!-- GroupManagement.vue -->
   <template>
-    <!-- 그룹 삭제 버튼 -->
-    <button class="deleteButton" @click="confirmDelete">그룹 삭제</button>
+    <div>
+      <!-- 그룹 삭제 버튼 -->
+      <button class="button" @click="confirmDelete">그룹 삭제</button>
+    </div>
     <div>
       <h2>그룹 멤버</h2>
       <table class="current-members-table">
@@ -16,7 +18,7 @@
           <tr v-for="member in currentMembers" :key="member.id">
             <td>{{ member.memberName }}</td>
             <td>
-              <button v-if="member.memberName !== userName" @click="removeMember(member.memberId)">추방</button>
+              <button v-if="member.memberName !== userName" @click="removeMember(member.memberId)" class="smallButton">추방</button>
               <span v-else>그룹장</span>
             </td>
           </tr>
@@ -35,12 +37,13 @@
           <tr v-for="request in joinRequests" :key="request.id">
             <td>{{ request.memberName }}</td>
             <td>
-              <button @click="approveRequest(request.memberId)">수락</button>
-              <button @click="rejectRequest(request.memberId)">거절</button>
+              <button @click="approveRequest(request.memberId)" class="smallButton">수락</button>
+              <button @click="rejectRequest(request.memberId)" class="smallButton">거절</button>
             </td>
           </tr>
         </tbody>
       </table>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </div>
   </template>
   
@@ -53,7 +56,8 @@
         joinRequests: [],
         currentMembers: [],
         groupId: this.$route.params.groupId,
-        userName: this.$store.state.userName
+        userName: this.$store.state.userName,
+        errorMessage: ''
       };
     },
     mounted() {
@@ -78,6 +82,7 @@
           this.currentMembers = response.data;
         } catch (error) {
           console.error('Error fetching current members:', error);
+          this.errorMessage = error.response.data.message;
         }
       },
       async fetchJoinRequests() {
@@ -90,6 +95,7 @@
           console.log('Join requests:', this.joinRequests);
         } catch (error) {
           console.error('Error fetching join requests:', error);
+          this.errorMessage = error.response.data.message;
         }
       },
       async removeMember(memberId) {
@@ -104,6 +110,7 @@
           console.log('Member removed successfully.');
         } catch (error) {
           console.error('Error removing member:', error);
+          this.errorMessage = error.response.data.message;
         }
       },
       async approveRequest(memberId) {
@@ -121,6 +128,7 @@
           this.fetchCurrentMembers();
         } catch (error) {
           console.error('Error approving request:', error);
+          this.errorMessage = error.response.data.message;
         }
       },
       async rejectRequest(memberId) {
@@ -135,11 +143,11 @@
           }, {
             withCredentials: true
           });
-          // Optionally, you can update the joinRequests list after rejecting
           this.fetchJoinRequests();
           console.log('Request rejected successfully.');
         } catch (error) {
           console.error('Error rejecting request:', error);
+          this.errorMessage = error.response.data.message;
         }
       },
       async deleteGroup() {
@@ -148,11 +156,11 @@
           {
             withCredentials: true
           });
-          // Optionally, you can navigate to another route or perform additional actions after deleting the group
           console.log('Group deleted successfully.');
           this.$router.push('/main');
         } catch (error) {
           console.error('Error deleting group:', error);
+          this.errorMessage = error.response.data.message;
         }
       }
     }
@@ -172,15 +180,41 @@
 .current-members-table td {
   border: 1px solid #ccc;
   padding: 8px;
+  width: 50%;
 }
 
 .join-requests-table th,
 .current-members-table th {
   background-color: #f2f2f2;
   font-weight: bold;
-  text-align: left;
 }
-.deleteButton {
+.button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
   margin: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #a8aaac;
+  color: white;
+}
+
+.smallButton {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+.smallButton:hover {
+  background-color: #a8aaac;
+  color: white;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
 }
 </style>

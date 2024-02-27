@@ -1,8 +1,7 @@
-<!-- App.vue -->
 <template>
-  <h1 @click="goToMainPage">일기장</h1>
-  <button @click="goToMainPage">홈</button>
   <div id="app">
+    <h1 @click="goToMainPage" class="logo">일기장</h1>
+    <button @click="goToMainPage" class="home-button">홈</button>
     <router-view></router-view>
   </div>
 </template>
@@ -26,5 +25,22 @@ export default {
 #app {
   font-family: Arial, sans-serif;
   text-align: center;
+}
+
+.logo {
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.home-button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.home-button:hover {
+  background-color: #a8aaac;
+  color: white;
 }
 </style>

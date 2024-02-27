@@ -18,9 +18,10 @@
     </table>
   </div>
   <div class="button-row">
-      <GroupCreationButton/>
-      <GroupJoinButton/>
+      <GroupCreationButton class="button"/>
+      <GroupJoinButton class="button"/>
     </div>
+  <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 </template>
   
 <script>
@@ -35,7 +36,8 @@ export default {
   },
   data() {
     return {
-      groupList: []
+      groupList: [],
+      errorMessage: ''
     };
   },
   mounted() {
@@ -52,6 +54,7 @@ export default {
         console.log('groupList:', this.groupList);
       } catch (error) {
         console.error('Error fetching post list:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     goToGroupDetail(groupId) {
@@ -62,25 +65,33 @@ export default {
 </script>
   
 <style scoped>
-.group-table {
-  margin: 0 auto;
-  border: 1px solid black;
-  width: 80%; /* 테이블 너비 조정 */
-}
-.group-table th, .group-table td {
-  border: 1px solid black;
-  padding: 0.5em;
-  cursor: pointer;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
   text-align: center;
 }
-.group-table th {
+
+th {
   background-color: #f2f2f2;
-  font-weight: bold;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  cursor: pointer;
 }
 
 .button-row {
   display: flex;
-  margin-top: 10px;
+  margin: 10px;
   justify-content: center;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
 }
 </style>

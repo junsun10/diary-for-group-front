@@ -7,7 +7,6 @@ import SignUp from "@/components/SignUp.vue";
 import Main from "@/components/Main.vue";
 import MyProfile from "@/components/MyProfile.vue";
 
-import PostList from "@/components/PostList.vue";
 import PostDetail from "@/components/PostDetail.vue";
 import PostWrite from "@/components/PostWrite.vue";
 import PostEdit from "@/components/PostEdit.vue";
@@ -58,12 +57,6 @@ const routes = [
   {
     path: "/group/:groupId",
     component: GroupPostList,
-    meta: { requiresAuth: true },
-  },
-
-  {
-    path: "/post",
-    component: PostList,
     meta: { requiresAuth: true },
   },
   {

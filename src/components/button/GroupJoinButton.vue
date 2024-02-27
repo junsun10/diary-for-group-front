@@ -1,21 +1,31 @@
 <!-- GroupJoinButton.vue -->
 <template>
-    <div>
-      <button @click="goToGroupJoinPage">그룹 가입</button>
-    </div>
-  </template>
+    <button @click="goToGroupJoinPage">그룹 가입</button>
+</template>
   
-  <script>
-  export default {
-    methods: {
-      goToGroupJoinPage() {
-        this.$router.push('/group/join');
-      }
+<script>
+export default {
+  methods: {
+    goToGroupJoinPage() {
+      this.$router.push('/group/join');
     }
   }
-  </script>
+}
+</script>
   
-  <style scoped>
-  /* Add your styles here if needed */
-  </style>
+<style scoped>
+.button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #a8aaac;
+  color: white;
+}
+</style>
   
