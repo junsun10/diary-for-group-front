@@ -29,7 +29,7 @@
         </thead>
         <tbody>
           <tr v-for="post in posts" :key="post.id" @click="goToPostDetail(post.id)">
-            <td>{{ post.title }}</td>
+            <td class="postTitle">{{ post.title }}</td>
             <td>{{ post.groupName }}</td>
             <td>{{ formatDate(post.createdDate) }}</td>
           </tr>
@@ -67,10 +67,13 @@
           </tr>
         </tbody>
       </table>
+      <!-- 회원탈퇴 버튼 -->
+      <button @click="confirmWithdrawal()" class="button">회원탈퇴</button>
     </div>
     <div v-else>
       <p>Loading...</p>
     </div>
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -79,12 +82,13 @@ import axios from 'axios';
 
 export default {
   data() {
-      return {
+    return {
       user: null,
       groups: [],
       posts: [],
       comments: [],
-      };
+      errorMessage: ''
+    };
   },
   mounted() {
     // 페이지가 마운트되면 사용자 정보를 가져옵니다.
@@ -104,7 +108,8 @@ export default {
         this.user = response.data;
         console.log("user", this.user);
       } catch (error) {
-          console.error("Error fetching user data:", error);
+        console.error("Error fetching user data:", error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchPostList() {
@@ -117,6 +122,7 @@ export default {
         console.log("posts", this.posts);
       } catch (error) {
         console.error('Error fetching post list:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchGroupList() {
@@ -129,6 +135,7 @@ export default {
         console.log("groups", this.groups);
       } catch (error) {
         console.error('Error fetching group list:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchCommentList() {
@@ -141,8 +148,34 @@ export default {
         console.log("comments", this.comments);
       } catch (error) {
         console.error('Error fetching comment list:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
+
+    async confirmWithdrawal() {
+      if (confirm('정말로 회원탈퇴를 하시겠습니까?')) {
+        this.withdrawal();
+      }
+    },
+    async withdrawal() {
+      try {
+        const response = await axios.delete('http://localhost:8080/members/remove',
+        {
+          withCredentials: true
+        });
+        if (response.status === 200) {
+          // 회원탈퇴 성공
+          console.log('회원탈퇴 성공:', response.data);
+          // 로그아웃 후 홈페이지로 이동 또는 필요에 따라 다른 동작 수행
+          this.$store.commit('logout');
+          this.$router.push('/');
+        }
+      } catch (error) {
+        console.error('Error withdrawing:', error);
+        this.errorMessage = error.response.data.message;
+      }
+    },
+
     formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleDateString();
@@ -175,5 +208,27 @@ th {
 td {
   padding: 8px;
   border: 1px solid #ddd;
+  cursor: pointer;
+}
+.postTitle {
+  text-align: left;
+}
+
+.button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #a8aaac;
+  color: white;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
 }
 </style>
