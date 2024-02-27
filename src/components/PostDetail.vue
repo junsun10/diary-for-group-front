@@ -28,14 +28,30 @@
                             <th class="info">작성자</th>
                             <th class="content">내용</th>
                             <th class="info">작성일</th>
+                            <th class="actions">작업</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="comment in comments" :key="comment.id">
-                            <td class="info">{{ comment.memberName }}</td>
-                            <td class="content">{{ comment.body }}</td>
-                            <td class="info">{{ formatDate(comment.createdDate) }}</td>
-                        </tr>
+                      <tr v-for="comment in comments" :key="comment.id">
+                        <td class="info">{{ comment.memberName }}</td>
+                        <!-- 수정 버튼을 누르면 수정 모드로 전환 -->
+                        <td class="content">
+                          <span v-if="comment.editing">
+                            <!-- 수정 중일 때는 입력 폼을 표시 -->
+                            <textarea v-model="comment.newBody" required></textarea>
+                          </span>
+                          <span v-else>
+                            <!-- 수정 중이 아닐 때는 댓글 내용을 표시 -->
+                            {{ comment.body }}
+                          </span>
+                        </td>
+                        <td class="info">{{ formatDate(comment.createdDate) }}</td>
+                        <td class="actions" v-if="isCommentAuthor(comment.memberName)">
+                          <button v-if="comment.editing" @click="saveCommentEdit(comment.id)">저장</button>
+                          <button v-else @click="startCommentEdit(comment)">수정</button>
+                          <button @click="confirmDeleteComment(comment.id)">삭제</button>
+                        </td>
+                      </tr>
                     </tbody>
                 </table>
                 <div v-else>
@@ -44,8 +60,8 @@
 
                 <!-- Comment Form -->
                 <form @submit.prevent="submitComment">
-                    <div>
-                        <label for="commentContent">댓글 작성:</label>
+                    <div class="newComment">
+                        <label for="commentContent">댓글 작성</label>
                         <textarea id="commentContent" v-model="newCommentContent" required></textarea>
                     </div>
                     <button type="submit">작성</button>
@@ -53,10 +69,11 @@
             </div>
             <div v-if="isAuthor" class="post-actions">
                 <button @click="editPost">수정</button>
-                <button @click="deletePost">삭제</button>
+                <button @click="confirmDeletePost()">삭제</button>
             </div>
         </div>
     </div>
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 </template>
   
 <script>
@@ -70,7 +87,8 @@ export default {
       comments: [],
       likes: [],
       like: null,
-      newCommentContent: ''
+      newCommentContent: '',
+      errorMessage: ''
     };
   },
   mounted() {
@@ -83,7 +101,7 @@ export default {
     isAuthor() {
       console.log(this.post.memberName,this.$store.state.userName);
       return this.post && this.post.memberName == this.$store.state.userName;
-    }
+    },
   },
   methods: {
     async fetchPostDetail() {
@@ -99,6 +117,7 @@ export default {
         console.log(this.post);
       } catch (error) {
         console.error('Error fetching post detail:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchCommentDetail() {
@@ -113,6 +132,7 @@ export default {
         this.comments = commentsResponse.data;
       } catch (error) {
         console.error('Error fetching comment detail:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchPostLikeDetail() {
@@ -127,6 +147,7 @@ export default {
         this.likes = likesResponse.data;
       } catch (error) {
         console.error('Error fetching post like detail:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async fetchMyPostLikeDetail() {
@@ -142,6 +163,7 @@ export default {
         console.log("my post like",this.like);
       } catch (error) {
         console.error('Error fetching post like detail:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     async toggleLike() {
@@ -172,7 +194,12 @@ export default {
             await this.fetchMyPostLikeDetail();
         } catch (error) {
             console.error('Error toggling like:', error);
+            this.errorMessage = error.response.data.message;
         }
+    },
+    isCommentAuthor(commentAuthor) {
+      console.log(commentAuthor,this.$store.state.userName);
+      return commentAuthor === this.$store.state.userName;
     },
     async submitComment() {
       try {
@@ -190,11 +217,64 @@ export default {
         this.newCommentContent = '';
       } catch (error) {
         console.error('Error submitting comment:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
+
+    startCommentEdit(comment) {
+      // 수정 모드로 전환
+      comment.editing = true;
+      // 수정 중인 내용을 현재 내용으로 초기화
+      comment.newBody = comment.body;
+    },
+    async saveCommentEdit(commentId) {
+      try {
+        const comment = this.comments.find(comment => comment.id === commentId);
+        // 수정된 내용을 서버에 저장
+        await axios.post(`http://localhost:8080/comments/${commentId}/edit`, {
+          id: commentId,
+          body: comment.newBody
+        },
+        {
+          withCredentials: true
+        });
+        // 수정이 완료되면 수정 모드를 해제하고 댓글을 다시 불러옴
+        comment.editing = false;
+        await this.fetchCommentDetail();
+      } catch (error) {
+        console.error('Error saving comment edit:', error);
+        this.errorMessage = error.response.data.message;
+      }
+    },
+    async confirmDeleteComment(commentId) {
+        // 확인 팝업을 띄웁니다.
+        if (confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
+            await this.deleteComment(commentId);
+        }
+    },
+
+    async deleteComment(commentId) {
+      try {
+        await axios.delete(`http://localhost:8080/comments/${commentId}/remove`, {
+            withCredentials: true
+        });
+        // 댓글 삭제 후, 댓글 목록을 다시 불러옵니다.
+        await this.fetchCommentDetail();
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+        this.errorMessage = error.response.data.message;
+      }
+    },
+
     editPost() {
       // 현재 포스트의 ID를 이용해 편집 페이지로 이동합니다.
       this.$router.push(`/post/${this.post.id}/edit`);
+    },
+    async confirmDeletePost() {
+        // 확인 팝업을 띄웁니다.
+        if (confirm("정말로 이 일기를 삭제하시겠습니까?")) {
+            await this.deletePost();
+        }
     },
     async deletePost() {
       try {
@@ -207,6 +287,7 @@ export default {
         this.$router.push('/main');
       } catch (error) {
         console.error('Error deleting post:', error);
+        this.errorMessage = error.response.data.message;
       }
     },
     formatDate(dateString) {
@@ -223,51 +304,102 @@ export default {
 <style scoped>
 .post-detail-container {
   border: 1px solid #ccc;
-  width: 80%;
-  margin: 0 auto;
-  padding: 0 10px 5px 10px;
+  width: 90%; /* 너비를 줄임 */
+  margin: 20px auto; /* 중앙 정렬 및 상하 여백 추가 */
+  padding: 10px;
 }
 
 .post-detail-header {
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px; /* 헤더와 바디 사이에 간격 추가 */
 }
+
 .post-body {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px 0;
-    text-align: justify;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px; /* 바디 아래 여백 추가 */
+  text-align: justify;
+  border-radius: 5px; /* 테두리를 부드럽게 만듦 */
+  line-height: 2;
 }
+
 .post-metadata {
   text-align: right;
 }
-.liked {
-    color: red; /* Change the color to red when liked */
-}
+
 .comments-box {
-    border: 1px solid #ccc;
-    padding: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0; /* 위쪽 여백 추가 */
 }
-.comment {
-    border: 1px solid #ccc;
-    margin: 10px 0;
-}
+
 .comment-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
-.comment-table th, .comment-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+
+.comment-table th,
+.comment-table td {
+  border: 1px solid #ddd;
+  padding: 10px; /* 셀 내부 여백 수정 */
+  text-align: left;
 }
+
 .comment-table th {
-    background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
+
+.comment .actions button {
+  margin-right: 5px; /* 버튼 사이 여백 추가 */
+}
+
 .content {
   width: 50%;
 }
-.info {
-  width: 20%;
+.newComment {
+  display: flex;
+  justify-content: flex-end; /* 내용을 오른쪽으로 정렬 */
+  align-items: center; /* 세로 가운데 정렬 */
+  margin: 10px 0; /* 아래쪽 여백 추가 */
+  /* border: 1px solid #ccc; */
+
 }
+
+.newComment label {
+  margin: 0 10px; /* 레이블과 입력창 사이의 간격 설정 */
+  font-weight: bold;
+}
+
+.newComment textarea {
+  flex: 1; /* 나머지 공간을 모두 차지하도록 함 */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+
+textarea {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+button:hover {
+  background-color: #a8aaac;
+  color: white;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
 </style>
