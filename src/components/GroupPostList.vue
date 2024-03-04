@@ -65,7 +65,7 @@ export default {
     async fetchPostList() {
       try {
         const groupId = this.$route.params.groupId;
-        const response = await axios.get(`http://localhost:8080/posts/my-group/${groupId}`, {
+        const response = await axios.get(`/posts/my-group/${groupId}`, {
           withCredentials: true
         });
         this.posts = response.data;
@@ -77,7 +77,7 @@ export default {
     },
     async checkIfGroupLeader() {
       try {
-        const response = await axios.get(`http://localhost:8080/groups/${this.groupId}`, {
+        const response = await axios.get(`/groups/${this.groupId}`, {
           withCredentials: true
         });
         if (response.data.groupLeaderId === this.$store.state.userId) {
@@ -95,7 +95,7 @@ export default {
     },
     async leaveGroup() {
       try {
-        await axios.delete(`http://localhost:8080/group-member/${this.groupId}/remove`, {
+        await axios.delete(`/group-member/${this.groupId}/remove`, {
           withCredentials: true
         });
         console.log('Group left successfully');

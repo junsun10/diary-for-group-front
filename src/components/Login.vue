@@ -28,7 +28,7 @@ export default {
       try {
         // 비밀번호 암호화
         const hashedPassword = CryptoJS.SHA256(this.password).toString(CryptoJS.enc.Hex);
-        const response = await axios.post('http://localhost:8080/members/login', {
+        const response = await axios.post(`/members/login`, {
           name: this.name,
           password: hashedPassword
         },

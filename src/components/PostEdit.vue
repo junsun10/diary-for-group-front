@@ -34,7 +34,7 @@
       async fetchPost() {
         try {
           const postId = this.$route.params.postId;
-          const response = await axios.get(`http://localhost:8080/posts/${postId}`,
+          const response = await axios.get(`/posts/${postId}`,
           {withCredentials: true});
           this.editedPost = response.data;
           console.log('Fetched post:', this.editedPost.title, this.editedPost.body);
@@ -49,7 +49,7 @@
           const postId = this.$route.params.postId;
           console.log('Editing post:', postId, this.editedPost.title, this.editedPost.body);
           console.log(this.$route.params.postId, this.editedPost.groupId);
-          await axios.post(`http://localhost:8080/posts/${postId}/edit`,
+          await axios.post(`/posts/${postId}/edit`,
           {
             id: this.editedPost.id,
             groupId: this.editedPost.groupId,

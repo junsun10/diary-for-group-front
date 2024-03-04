@@ -108,7 +108,7 @@ export default {
       try {
         const postId = this.$route.params.postId;
         const [postResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/posts/${postId}`,
+          axios.get(`/posts/${postId}`,
           {
             withCredentials: true
           })
@@ -124,7 +124,7 @@ export default {
       try {
         const postId = this.$route.params.postId;
         const [commentsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/comments/post/${postId}`,
+          axios.get(`/comments/post/${postId}`,
           {
             withCredentials: true
           })
@@ -139,7 +139,7 @@ export default {
       try {
         const postId = this.$route.params.postId;
         const [likesResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/post-likes/post/${postId}`,
+          axios.get(`/post-likes/post/${postId}`,
           {
             withCredentials: true
           })
@@ -154,7 +154,7 @@ export default {
       try {
         const postId = this.$route.params.postId;
         const [likeResponse] = await Promise.all([
-            axios.get(`http://localhost:8080/post-likes/my-status/post/${postId}`,
+            axios.get(`/post-likes/my-status/post/${postId}`,
           {
             withCredentials: true
           })
@@ -171,7 +171,7 @@ export default {
           const postId = this.$route.params.postId;
             if (this.like) {
                 // Unlike the post
-                const response = await axios.delete(`http://localhost:8080/post-likes/post/${postId}`,
+                const response = await axios.delete(`/post-likes/post/${postId}`,
                   {
                     withCredentials: true
                   }
@@ -180,7 +180,7 @@ export default {
             } else {
               console.log(this.post.id,"post like");
                 // Like the post
-                const response = await axios.post(`http://localhost:8080/post-likes`,
+                const response = await axios.post(`/post-likes`,
                   {
                     postId: this.post.id
                   },
@@ -204,7 +204,7 @@ export default {
     async submitComment() {
       try {
         const postId = this.$route.params.postId;
-        await axios.post(`http://localhost:8080/comments/new`, {
+        await axios.post(`/comments/new`, {
             postId: postId,
             body: this.newCommentContent
         },
@@ -231,7 +231,7 @@ export default {
       try {
         const comment = this.comments.find(comment => comment.id === commentId);
         // 수정된 내용을 서버에 저장
-        await axios.post(`http://localhost:8080/comments/${commentId}/edit`, {
+        await axios.post(`/comments/${commentId}/edit`, {
           id: commentId,
           body: comment.newBody
         },
@@ -255,7 +255,7 @@ export default {
 
     async deleteComment(commentId) {
       try {
-        await axios.delete(`http://localhost:8080/comments/${commentId}/remove`, {
+        await axios.delete(`/comments/${commentId}/remove`, {
             withCredentials: true
         });
         // 댓글 삭제 후, 댓글 목록을 다시 불러옵니다.
@@ -279,7 +279,7 @@ export default {
     async deletePost() {
       try {
         const postId = this.$route.params.postId;
-        await axios.delete(`http://localhost:8080/posts/${postId}/remove`,
+        await axios.delete(`/posts/${postId}/remove`,
           {
             withCredentials: true
           });

@@ -75,7 +75,7 @@
       },
       async fetchCurrentMembers() {
         try {
-          const response = await axios.get(`http://localhost:8080/group-member/${this.groupId}`, {
+          const response = await axios.get(`/group-member/${this.groupId}`, {
             withCredentials: true
           });
           console.log('Current members:', response.data);
@@ -88,7 +88,7 @@
       async fetchJoinRequests() {
         try {
           const groupId = this.$route.params.groupId;
-          const response = await axios.get(`http://localhost:8080/group-member/request/${groupId}`, {
+          const response = await axios.get(`/group-member/request/${groupId}`, {
             withCredentials: true
           });
           this.joinRequests = response.data;
@@ -101,7 +101,7 @@
       async removeMember(memberId) {
         try {
           const groupId = this.$route.params.groupId;
-          await axios.delete(`http://localhost:8080/group-member/${groupId}/${memberId}/remove`, 
+          await axios.delete(`/group-member/${groupId}/${memberId}/remove`, 
           {
             withCredentials: true
           });
@@ -115,7 +115,7 @@
       },
       async approveRequest(memberId) {
         try {
-          await axios.post(`http://localhost:8080/group-member/group/accept`, 
+          await axios.post(`/group-member/group/accept`, 
           {
             groupId: this.groupId,
             memberId: memberId
@@ -135,7 +135,7 @@
         console.log('groupId:', this.groupId);
         console.log('memberId:', memberId);
         try {
-          await axios.post(`http://localhost:8080/group-member/group/reject`, 
+          await axios.post(`/group-member/group/reject`, 
           {
             groupId: this.groupId,
             memberId: memberId
@@ -152,7 +152,7 @@
       },
       async deleteGroup() {
         try {
-          await axios.delete(`http://localhost:8080/groups/${this.groupId}/remove`, 
+          await axios.delete(`/groups/${this.groupId}/remove`, 
           {
             withCredentials: true
           });

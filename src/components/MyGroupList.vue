@@ -46,7 +46,7 @@ export default {
   methods: {
     async fetchPostList() {
       try {
-        const response = await axios.get(`http://localhost:8080/groups/my`,
+        const response = await axios.get(`/groups/my`,
         {
           withCredentials: true
         });

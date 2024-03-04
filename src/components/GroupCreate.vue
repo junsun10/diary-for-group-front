@@ -24,7 +24,7 @@ export default {
   methods: {
     async createGroup() {
       try {
-        const response = await axios.post('http://localhost:8080/groups/new', {
+        const response = await axios.post(`/groups/new`, {
           name: this.groupName
         }, {
           withCredentials: true

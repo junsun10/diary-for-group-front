@@ -33,12 +33,9 @@ export default createStore({
     },
     async checkLoginStatus({ commit }) {
       try {
-        const response = await axios.get(
-          `http://localhost:8080/members/login-status`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`/members/login-status`, {
+          withCredentials: true,
+        });
         // 성공적으로 로그인된 상태라면 commit을 사용하여 상태를 갱신합니다.
         commit("login", {
           userId: response.data.id,

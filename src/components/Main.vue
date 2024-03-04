@@ -26,7 +26,7 @@ export default {
   methods: {
     async logout() {
       try {
-        await axios.post(`http://localhost:8080/members/logout`, null, {
+        await axios.post(`/members/logout`, null, {
           withCredentials: true
         });
         // Vuex store의 logout 뮤테이션을 호출하여 로그아웃 상태 변경

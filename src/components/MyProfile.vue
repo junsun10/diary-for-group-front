@@ -101,7 +101,7 @@ export default {
     async fetchUserData() {
       try {
         // API를 호출하여 사용자 정보를 가져옵니다.
-        const response = await axios.get("http://localhost:8080/members/my-profile",
+        const response = await axios.get(`/members/my-profile`,
         {
             withCredentials: true
         });
@@ -114,7 +114,7 @@ export default {
     },
     async fetchPostList() {
       try {
-        const response = await axios.get(`http://localhost:8080/posts/my`,
+        const response = await axios.get(`/posts/my`,
         {
           withCredentials: true
         });
@@ -127,7 +127,7 @@ export default {
     },
     async fetchGroupList() {
       try {
-        const response = await axios.get(`http://localhost:8080/groups/my`,
+        const response = await axios.get(`/groups/my`,
         {
           withCredentials: true
         });
@@ -140,7 +140,7 @@ export default {
     },
     async fetchCommentList() {
       try {
-        const response = await axios.get(`http://localhost:8080/comments/my`,
+        const response = await axios.get(`/comments/my`,
         {
           withCredentials: true
         });
@@ -159,7 +159,7 @@ export default {
     },
     async withdrawal() {
       try {
-        const response = await axios.delete('http://localhost:8080/members/remove',
+        const response = await axios.delete(`/members/remove`,
         {
           withCredentials: true
         });

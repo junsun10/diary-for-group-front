@@ -30,7 +30,7 @@ export default {
   methods: {
     async submitDiary() {
       try {
-        const response = await axios.post('http://localhost:8080/posts/new', {
+        const response = await axios.post(`/posts/new`, {
           groupId: this.$route.params.groupId,
           title: this.title,
           body: this.body
